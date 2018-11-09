@@ -1,4 +1,4 @@
-package com.karenkgs.recipes;
+package com.karenkgs.recipesAPI;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

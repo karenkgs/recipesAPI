@@ -1,10 +1,12 @@
 package com.karenkgs.recipesAPI.recipe;
 
 import com.karenkgs.recipesAPI.ingredient.Ingredient;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
+@Component
 public class Recipe implements Comparable {
   private String title;
   private List<Ingredient> ingredients;

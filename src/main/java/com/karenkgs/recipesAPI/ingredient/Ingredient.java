@@ -2,10 +2,12 @@ package com.karenkgs.recipesAPI.ingredient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Component
 public class Ingredient implements Comparable {
   private String title;
   @JsonProperty("best-before")

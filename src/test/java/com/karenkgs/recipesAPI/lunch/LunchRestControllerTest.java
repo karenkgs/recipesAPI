@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +47,12 @@ public class LunchRestControllerTest {
   }
 
   @Test
+  public void shouldReturnErrorWithNonExistingIngredientOnURL() throws Exception {
+    mvc.perform(get("/lunch?ingredients=doesnt exist"))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
   public void shouldReturnHamAndCheeseToastieRecipeWithHamCheeseButterAndBreadIngredientsOnURL() throws Exception {
     List<Ingredient> ingredientsAsObjects = Arrays.asList(
         new Ingredient("Ham", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19")),
@@ -74,20 +79,6 @@ public class LunchRestControllerTest {
         .andExpect(jsonPath("$").isArray())
         .andExpect(jsonPath("$[0].title").value(recipes.get(0).getTitle()))
         .andExpect(status().isOk());
-  }
-
-  @Test
-  public void shouldNotReturnRecipesWithPastUseByDateIngredientsOnURL() throws Exception {
-    List<String> ingredientsAsString = Arrays.asList(
-        "salad Dressing",
-        "mushrooms"
-    );
-
-    when(lunchService.getRecipesByIngredients(ingredientsAsString)).thenReturn(new ArrayList<>());
-
-    mvc.perform(get("/lunch?ingredients=salad dressing, mushrooms"))
-        .andDo(print())
-        .andExpect(status().isNotFound());
   }
 
   @Test

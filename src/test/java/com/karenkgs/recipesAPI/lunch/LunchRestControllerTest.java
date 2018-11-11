@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -32,7 +34,7 @@ public class LunchRestControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @Mock
+    @MockBean
     private LunchService lunchService;
 
     @Before
@@ -56,10 +58,10 @@ public class LunchRestControllerTest {
         );
 
         List<String> ingredientsAsString = Arrays.asList(
-                "Ham",
-                "Cheese",
-                "Bread",
-                "Butter"
+                "ham",
+                "cheese",
+                "bread",
+                "butter"
         );
 
         List<Recipe> recipes = Arrays.asList(new Recipe("Ham and Cheese Toastie", ingredientsAsObjects));
@@ -78,14 +80,50 @@ public class LunchRestControllerTest {
     @Test
     public void shouldNotReturnRecipesWithPastUseByDateIngredientsOnURL() throws Exception {
         List<String> ingredientsAsString = Arrays.asList(
-                "Salad Dressing",
-                "Mushrooms"
+                "salad Dressing",
+                "mushrooms"
         );
 
         when(lunchService.getRecipesByIngredients(ingredientsAsString)).thenReturn(new ArrayList<>());
 
-        mvc.perform(get("lunch?ingredients=salad dressing, mushrooms"))
+        mvc.perform(get("/lunch?ingredients=salad dressing, mushrooms"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldOrderRecipesByItsIngredientsBestBeforeDates() throws Exception {
+        Ingredient sweetCondensedMilk = new Ingredient("Sweet condensed milk", LocalDate.parse("2018-11-13"), LocalDate.parse("2018-11-19"));
+        Ingredient butter = new Ingredient("Butter", LocalDate.parse("2018-11-12"), LocalDate.parse("2018-11-19"));
+        Ingredient chocolate = new Ingredient("Chocolate", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19"));
+        Ingredient shreddedCoconut = new Ingredient("Shredded coconut", LocalDate.parse("2018-11-11"), LocalDate.parse("2018-11-19"));
+        Ingredient popcorn = new Ingredient("Popcorn", LocalDate.parse("2018-11-10"), LocalDate.parse("2018-11-19"));
+
+        List<String> ingredientsAsString = Arrays.asList(
+                "chocolate",
+                "sweet condensed milk",
+                "shredded coconut",
+                "butter",
+                "popcorn"
+        );
+
+        List<Recipe> recipes = Arrays.asList(
+                new Recipe("Pipoca doce", Arrays.asList(sweetCondensedMilk, chocolate, popcorn)),
+                new Recipe("Brigadeiro", Arrays.asList(sweetCondensedMilk, butter, chocolate)),
+                new Recipe("Beijinho", Arrays.asList(sweetCondensedMilk, shreddedCoconut, butter))
+        );
+
+        Collections.sort(recipes);
+
+        when(lunchService.getRecipesByIngredients(ingredientsAsString)).thenReturn(recipes);
+
+        mvc.perform(get("/lunch?ingredients=chocolate,sweet condensed milk,shredded coconut,butter,popcorn")
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$[0].title").value("Brigadeiro"))
+                .andExpect(jsonPath("$[1].title").value("Beijinho"))
+                .andExpect(jsonPath("$[2].title").value("Pipoca doce"))
+                .andExpect(status().isOk());
     }
 }

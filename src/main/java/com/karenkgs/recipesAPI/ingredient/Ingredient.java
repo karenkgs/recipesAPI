@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Ingredient {
-
-    @JsonProperty("title")
+public class Ingredient implements Comparable {
     private String title;
     @JsonProperty("best-before")
     private LocalDate bestBefore;
@@ -74,5 +72,10 @@ public class Ingredient {
     @Override
     public int hashCode() {
         return Objects.hash(title.toLowerCase());
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return bestBefore.compareTo(((Ingredient)o).getBestBefore());
     }
 }

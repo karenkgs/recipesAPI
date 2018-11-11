@@ -51,8 +51,8 @@ public class RecipeRepository {
         List<Recipe> recipes = new ArrayList<>();
 
         for (Recipe recipe : findAll()) {
-            if (recipe.getIngredients().containsAll(ingredients)
-                    && recipe.getIngredients().stream().allMatch((Ingredient::isValid))) {
+            if (recipe.getIngredients().stream().allMatch((Ingredient::isValid))
+                    && ingredients.containsAll(recipe.getIngredients())) {
                 recipes.add(recipe);
             }
         }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -56,6 +57,9 @@ public class RecipeRepository {
         recipes.add(recipe);
       }
     }
+
+    Collections.sort(recipes);
+
     return recipes;
   }
 }

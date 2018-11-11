@@ -13,22 +13,22 @@ import java.util.List;
 @Repository
 public class IngredientRepository {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+  @Autowired
+  private ObjectMapper objectMapper;
 
-    public List<Ingredient> findAll() {
-        try {
-            InputStream is = IngredientWrapper.class.getResourceAsStream("/ingredients.json");
-            IngredientWrapper ingredientWrapper = objectMapper.readValue(is, new TypeReference<IngredientWrapper>() {
-            });
-            return ingredientWrapper.getIngredients();
-        } catch (IOException exception) {
-            System.out.println("Problem:" + exception.getMessage() + " " + exception.getCause() + exception.getStackTrace());
-        }
-        return new ArrayList<>();
+  public List<Ingredient> findAll() {
+    try {
+      InputStream is = IngredientWrapper.class.getResourceAsStream("/ingredients.json");
+      IngredientWrapper ingredientWrapper = objectMapper.readValue(is, new TypeReference<IngredientWrapper>() {
+      });
+      return ingredientWrapper.getIngredients();
+    } catch (IOException exception) {
+      System.out.println("Problem:" + exception.getMessage() + " " + exception.getCause() + exception.getStackTrace());
     }
+    return new ArrayList<>();
+  }
 
-    public Ingredient findIngredientByTitle(String title) {
-        return findAll().stream().filter(ingredient -> ingredient.getTitle().equalsIgnoreCase(title)).findFirst().orElse(null);
-    }
+  public Ingredient findIngredientByTitle(String title) {
+    return findAll().stream().filter(ingredient -> ingredient.getTitle().equalsIgnoreCase(title)).findFirst().orElse(null);
+  }
 }

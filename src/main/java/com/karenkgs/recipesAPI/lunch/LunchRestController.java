@@ -12,16 +12,16 @@ import java.util.List;
 @RestController
 public class LunchRestController {
 
-    @Autowired
-    private LunchService lunchService;
+  @Autowired
+  private LunchService lunchService;
 
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-    public @ResponseBody
-    ResponseEntity<List<Recipe>> getRecipesByIngredients(@RequestParam(name = "ingredients") List<String> ingredients) {
-        final List<Recipe> recipes = lunchService.getRecipesByIngredients(ingredients);
-        if (null == recipes || recipes.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(recipes, HttpStatus.OK);
+  @RequestMapping(method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+  public @ResponseBody
+  ResponseEntity<List<Recipe>> getRecipesByIngredients(@RequestParam(name = "ingredients") List<String> ingredients) {
+    final List<Recipe> recipes = lunchService.getRecipesByIngredients(ingredients);
+    if (null == recipes || recipes.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+    return new ResponseEntity<>(recipes, HttpStatus.OK);
+  }
 }

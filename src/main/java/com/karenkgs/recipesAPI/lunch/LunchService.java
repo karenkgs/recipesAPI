@@ -15,21 +15,21 @@ import java.util.stream.Collectors;
 @Service
 public class LunchService {
 
-    @Autowired
-    private RecipeRepository recipeRepository;
+  @Autowired
+  private RecipeRepository recipeRepository;
 
-    @Autowired
-    private IngredientRepository ingredientRepository;
+  @Autowired
+  private IngredientRepository ingredientRepository;
 
-    public List<Recipe> getRecipesByIngredients(List<String> ingredients) {
-        List<Ingredient> ingredientsFromString = ingredients.stream().map(
-                ingredientRepository::findIngredientByTitle)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+  public List<Recipe> getRecipesByIngredients(List<String> ingredients) {
+    List<Ingredient> ingredientsFromString = ingredients.stream().map(
+        ingredientRepository::findIngredientByTitle)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
 
-        if(null == ingredientsFromString || ingredientsFromString.isEmpty()){
-            return new ArrayList<>();
-        }
-        return recipeRepository.findRecipesByIngredients(ingredientsFromString);
+    if (null == ingredientsFromString || ingredientsFromString.isEmpty()) {
+      return new ArrayList<>();
     }
+    return recipeRepository.findRecipesByIngredients(ingredientsFromString);
+  }
 }

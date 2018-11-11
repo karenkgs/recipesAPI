@@ -7,7 +7,9 @@ import com.karenkgs.recipesAPI.recipe.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,9 +23,13 @@ public class LunchService {
 
     public List<Recipe> getRecipesByIngredients(List<String> ingredients) {
         List<Ingredient> ingredientsFromString = ingredients.stream().map(
-                ingredient -> ingredientRepository.findIngredientFromFactoryByTitle(ingredient))
+                ingredientRepository::findIngredientByTitle)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        return recipeRepository.findRecipesFromFactoryByIngredients(ingredientsFromString);
+        if(null == ingredientsFromString || ingredientsFromString.isEmpty()){
+            return new ArrayList<>();
+        }
+        return recipeRepository.findRecipesByIngredients(ingredientsFromString);
     }
 }

@@ -1,12 +1,27 @@
 package com.karenkgs.recipesAPI.ingredient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class Ingredient {
+
+    @JsonProperty("title")
     private String title;
+    @JsonProperty("best-before")
     private LocalDate bestBefore;
+    @JsonProperty("use-by")
     private LocalDate useBy;
+
+    public Ingredient() {
+
+    }
+
+    public Ingredient(String title) {
+        this.title = title;
+    }
 
     public Ingredient(String title, LocalDate bestBefore, LocalDate useBy) {
         this.title = title;
@@ -16,6 +31,36 @@ public class Ingredient {
 
     public String getTitle() {
         return title;
+    }
+
+    public LocalDate getBestBefore() {
+        return bestBefore;
+    }
+
+    public void setBestBefore(LocalDate bestBefore) {
+        this.bestBefore = bestBefore;
+    }
+
+    public void setUseBy(LocalDate useBy) {
+        this.useBy = useBy;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public LocalDate getUseBy() {
+        return useBy;
+    }
+
+    @JsonIgnore
+    public boolean isValid() {
+        return null != useBy && null != title && null != bestBefore && isNotSpoiled();
+    }
+
+    @JsonIgnore
+    public boolean isNotSpoiled() {
+        return useBy.plusDays(1).isAfter(LocalDate.now());
     }
 
     @Override

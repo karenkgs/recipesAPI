@@ -3,7 +3,6 @@ package com.karenkgs.recipesAPI.lunch;
 import com.karenkgs.recipesAPI.ingredient.Ingredient;
 import com.karenkgs.recipesAPI.ingredient.IngredientRepository;
 import com.karenkgs.recipesAPI.recipe.Recipe;
-import com.karenkgs.recipesAPI.recipe.RecipeFactory;
 import com.karenkgs.recipesAPI.recipe.RecipeRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,26 +41,26 @@ public class LunchServiceTest {
         Ingredient bread = new Ingredient("Bread", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19"));
         Ingredient butter = new Ingredient("Butter", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19"));
 
-        when(ingredientRepository.findIngredientFromFactoryByTitle("ham")).thenReturn(ham);
-        when(ingredientRepository.findIngredientFromFactoryByTitle("cheese")).thenReturn(cheese);
-        when(ingredientRepository.findIngredientFromFactoryByTitle("butter")).thenReturn(butter);
-        when(ingredientRepository.findIngredientFromFactoryByTitle("bread")).thenReturn(bread);
+        when(ingredientRepository.findIngredientByTitle("ham")).thenReturn(ham);
+        when(ingredientRepository.findIngredientByTitle("cheese")).thenReturn(cheese);
+        when(ingredientRepository.findIngredientByTitle("butter")).thenReturn(butter);
+        when(ingredientRepository.findIngredientByTitle("bread")).thenReturn(bread);
 
-        when(recipeRepository.findRecipesFromFactory()).thenReturn(RecipeFactory.recipes());
+        when(recipeRepository.findAll()).thenReturn(Arrays.asList(new Recipe("Ham and Cheese Toastie", Arrays.asList(ham, cheese, bread, butter))));
 
-        when(recipeRepository.findRecipesFromFactoryByIngredients(new ArrayList<>(Arrays.asList(ham, cheese, butter, bread)))
-        ).thenReturn(new ArrayList<>(Arrays.asList(
+        when(recipeRepository.findRecipesByIngredients(Arrays.asList(ham, cheese, butter, bread))
+        ).thenReturn(Arrays.asList(
                 new Recipe("Ham and Cheese Toastie",
-                        new ArrayList<>(Arrays.asList(
+                        Arrays.asList(
                                 ham,
                                 cheese,
                                 butter,
                                 bread
                         ))
-                )))
+                )
         );
 
-        Recipe resultRecipe = lunchService.getRecipesByIngredients(new ArrayList<>(Arrays.asList("ham", "cheese", "butter", "bread"))).get(0);
+        Recipe resultRecipe = lunchService.getRecipesByIngredients(Arrays.asList("ham", "cheese", "butter", "bread")).get(0);
 
         assertThat(resultRecipe.getTitle(), is("Ham and Cheese Toastie"));
     }

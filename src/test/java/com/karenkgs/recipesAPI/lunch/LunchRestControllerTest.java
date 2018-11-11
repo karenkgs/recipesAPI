@@ -47,22 +47,22 @@ public class LunchRestControllerTest {
     }
 
     @Test
-    public void shouldReturnHamAndCheeseToastieRecipeWithHamCheeseButterAndBreadParametersOnURL() throws Exception {
-        List<Ingredient> ingredientsAsObjects = new ArrayList<>(Arrays.asList(
+    public void shouldReturnHamAndCheeseToastieRecipeWithHamCheeseButterAndBreadIngredientsOnURL() throws Exception {
+        List<Ingredient> ingredientsAsObjects = Arrays.asList(
                 new Ingredient("Ham", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19")),
                 new Ingredient("Cheese", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19")),
                 new Ingredient("Bread", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19")),
                 new Ingredient("Butter", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19"))
-        ));
+        );
 
-        List<String> ingredientsAsString = new ArrayList<>(Arrays.asList(
+        List<String> ingredientsAsString = Arrays.asList(
                 "Ham",
                 "Cheese",
                 "Bread",
                 "Butter"
-        ));
+        );
 
-        List<Recipe> recipes = new ArrayList<>(Arrays.asList(new Recipe("Ham and Cheese Toastie", ingredientsAsObjects)));
+        List<Recipe> recipes = Arrays.asList(new Recipe("Ham and Cheese Toastie", ingredientsAsObjects));
 
         when(lunchService.getRecipesByIngredients(ingredientsAsString)).thenReturn(recipes);
 
@@ -73,5 +73,19 @@ public class LunchRestControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].title").value(recipes.get(0).getTitle()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldNotReturnRecipesWithPastUseByDateIngredientsOnURL() throws Exception {
+        List<String> ingredientsAsString = Arrays.asList(
+                "Salad Dressing",
+                "Mushrooms"
+        );
+
+        when(lunchService.getRecipesByIngredients(ingredientsAsString)).thenReturn(new ArrayList<>());
+
+        mvc.perform(get("lunch?ingredients=salad dressing, mushrooms"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 }

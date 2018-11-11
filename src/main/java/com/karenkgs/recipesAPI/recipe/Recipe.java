@@ -16,4 +16,8 @@ public class Recipe {
     public String getTitle() {
         return title;
     }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
 }

@@ -1,32 +1,77 @@
 package com.karenkgs.recipesAPI.lunch;
 
+import com.karenkgs.recipesAPI.ingredient.Ingredient;
+import com.karenkgs.recipesAPI.recipe.Recipe;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(LunchRestController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class LunchRestControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
-    private LunchService service;
+    @Mock
+    private LunchService lunchService;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
-    public void shouldReturnErrorMessageWithNoParametersOnURL() throws Exception {
+    public void shouldReturnErrorWithNoParametersOnURL() throws Exception {
         mvc.perform(get("/lunch"))
-                .andExpect(content().string("You have to pass the ingredients from your fridge."))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void shouldReturnHamAndCheeseToastieRecipeWithHamCheeseButterAndBreadParametersOnURL() throws Exception {
+        List<Ingredient> ingredientsAsObjects = new ArrayList<>(Arrays.asList(
+                new Ingredient("Ham", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19")),
+                new Ingredient("Cheese", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19")),
+                new Ingredient("Bread", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19")),
+                new Ingredient("Butter", LocalDate.parse("2018-11-14"), LocalDate.parse("2018-11-19"))
+        ));
+
+        List<String> ingredientsAsString = new ArrayList<>(Arrays.asList(
+                "Ham",
+                "Cheese",
+                "Bread",
+                "Butter"
+        ));
+
+        List<Recipe> recipes = new ArrayList<>(Arrays.asList(new Recipe("Ham and Cheese Toastie", ingredientsAsObjects)));
+
+        when(lunchService.getRecipesByIngredients(ingredientsAsString)).thenReturn(recipes);
+
+        mvc.perform(get("/lunch?ingredients=ham,cheese,bread,butter")
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].title").value(recipes.get(0).getTitle()))
                 .andExpect(status().isOk());
     }
 }

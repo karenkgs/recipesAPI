@@ -28,6 +28,6 @@ public class IngredientFactory {
     }
 
     public static Ingredient ingredientByTitle(String title) {
-        return ingredients().stream().filter(ingredient -> ingredient.getTitle().equals(title)).findFirst().orElse(null);
+        return ingredients().stream().filter(ingredient -> ingredient.getTitle().equalsIgnoreCase(title)).findFirst().orElse(null);
     }
 }
